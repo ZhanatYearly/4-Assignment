@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bank System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1> Bank Customers</h1>
+
+<form id="form">
+    <input type="number" id="id" placeholder="ID" required>
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="address" placeholder="Address" required>
+    <button type="submit">Add Customer</button>
+</form>
+
+<hr>
+
+<button onclick="loadCustomers()">Show Customers</button>
+
+<ul id="list"></ul>
+
+<script>
+
+    const form = document.getElementById("form");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const customer = {
+            id: document.getElementById("id").value,
+            name: document.getElementById("name").value,
+            address: document.getElementById("address").value
+        };
+
+        await fetch("/customers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(customer)
+        });
+
+        alert("Customer added!");
+        loadCustomers();
+    });
+
+    async function loadCustomers() {
+        const res = await fetch("/customers");
+        const data = await res.json();
+
+        const list = document.getElementById("list");
+        list.innerHTML = "";
+
+        data.forEach(c => {
+            const li = document.createElement("li");
+            li.textContent = `${c.id} | ${c.name} | ${c.address}`;
+            list.appendChild(li);
+        });
+    }
+
+</script>
+
+</body>
+</html>
