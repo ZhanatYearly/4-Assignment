@@ -42,4 +42,36 @@ public class CustomerDAO {
             e.printStackTrace();
         }
     }
+    // UPDATE
+    public void update(Customer c) {
+
+        String sql = "UPDATE customers SET name = ?, address = ? WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, c.getName());
+            ps.setString(2, c.getAddress());
+            ps.setInt(3, c.getId());
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void deleteById(int id) {
+
+        String sql = "DELETE FROM customers WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
