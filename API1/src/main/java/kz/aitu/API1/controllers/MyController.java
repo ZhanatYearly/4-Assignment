@@ -26,10 +26,8 @@ public class MyController {
     @PutMapping("/{id}")
     public String update(@PathVariable int id,
                          @RequestBody Customer customer) {
-
         customer.setId(id);
         dao.update(customer);
-
         return "Customer updated";
     }
 
@@ -38,4 +36,11 @@ public class MyController {
         dao.deleteById(id);
         return "Customer deleted";
     }
+
+    @GetMapping("/sorted")
+    public List<Customer> getSorted() {
+        return dao.findAllSorted();
+    }
+
+
 }

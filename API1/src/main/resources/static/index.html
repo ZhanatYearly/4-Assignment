@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank Customers</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Banking System</h1>
+
+<div class="card">
+    <h2>Add / Update Customer</h2>
+
+    <input id="id" type="number" placeholder="ID">
+    <input id="name" type="text" placeholder="Name">
+    <input id="address" type="text" placeholder="Address">
+
+    <button onclick="addCustomer()">Add Customer</button>
+    <button onclick="updateCustomer()">Update Customer</button>
+    <button onclick="loadSorted()">Sort A-Z</button>
+
+</div>
+
+<div class="card">
+    <h2>Customers</h2>
+    <button onclick="loadCustomers()">GET Load Customers</button>
+
+    <table id="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+
+    const API = "/customers";
+
+
+    async function loadCustomers() {
+
+        const res = await fetch(API);
+        const data = await res.json();
+
+        const tbody = document.querySelector("#table tbody");
+        tbody.innerHTML = "";
+
+        data.forEach(c => {
+            const row = `
+                <tr>
+                    <td>${c.id}</td>
+                    <td>${c.name}</td>
+                    <td>${c.address}</td>
+                    <td>
+                        <button onclick="fillForm(${c.id}, '${c.name}', '${c.address}')">Edit</button>
+                        <button onclick="deleteCustomer(${c.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+
+    async function addCustomer() {
+
+        const customer = {
+            id: document.getElementById("id").value,
+            name: document.getElementById("name").value,
+            address: document.getElementById("address").value
+        };
+
+        await fetch(API, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(customer)
+        });
+
+        loadCustomers();
+    }
+
+    async function updateCustomer() {
+
+        const id = document.getElementById("id").value;
+
+        const customer = {
+            name: document.getElementById("name").value,
+            address: document.getElementById("address").value
+        };
+
+        await fetch(API + "/" + id, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(customer)
+        });
+
+        loadCustomers();
+    }
+
+
+    async function deleteCustomer(id) {
+
+        await fetch(API + "/" + id, {
+            method: "DELETE"
+        });
+
+        loadCustomers();
+    }
+
+
+    function fillForm(i, n, a) {
+        document.getElementById("id").value = i;
+        document.getElementById("name").value = n;
+        document.getElementById("address").value = a;
+    }
+   async function loadSorted() {
+
+    const res = await fetch("/customers/sorted");
+    const data = await res.json();
+
+    const tbody = document.querySelector("#table tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(c => {
+        const row = `
+            <tr>
+                <td>${c.id}</td>
+                <td>${c.name}</td>
+                <td>${c.address}</td>
+                <td>
+                    <button onclick="fillForm(${c.id}, '${c.name}', '${c.address}')">Edit</button>
+                    <button onclick="deleteCustomer(${c.id})">Delete</button>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}
+
+
+</script>
+
+</body>
+</html>

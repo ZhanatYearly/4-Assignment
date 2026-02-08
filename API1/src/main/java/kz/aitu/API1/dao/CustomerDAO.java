@@ -27,6 +27,38 @@ public class CustomerDAO {
 
         return list;
     }
+    public Customer findById(int id) {
+
+        Customer customer = null;
+
+        String sql = "SELECT * FROM customers WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                customer = new Customer(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("address")
+                );
+            }
+
+            if (customer == null) {
+                throw new RuntimeException("Customer not found");
+            }
+
+            return customer;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public void save(Customer c) {
         try (Connection conn = DBConnection.getConnection();
@@ -39,10 +71,10 @@ public class CustomerDAO {
 
             ps.executeUpdate();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
-    // UPDATE
+
     public void update(Customer c) {
 
         String sql = "UPDATE customers SET name = ?, address = ? WHERE id = ?";
@@ -54,7 +86,11 @@ public class CustomerDAO {
             ps.setString(2, c.getAddress());
             ps.setInt(3, c.getId());
 
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                throw new RuntimeException("Customer not found for update");
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,10 +104,24 @@ public class CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                throw new RuntimeException("Customer not found for delete");
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+    public List<Customer> findAllSorted() {
+
+        List<Customer> list = findAll();
+
+        list.sort((a, b) ->
+                a.getName().compareToIgnoreCase(b.getName()));
+
+        return list;
+    }
+
 }
